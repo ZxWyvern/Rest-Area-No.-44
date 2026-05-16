@@ -1,108 +1,39 @@
-using Game;
 using UnityEngine;
 
 namespace Game.Player
 {
     public sealed class PlayerCameraSystem
     {
-        private readonly Transform            _cameraRoot;
-        private readonly Camera              _camera;
-        private readonly IInputReader         _input;
-        private readonly PlayerCameraConfig   _config;
-        private readonly PlayerMovementSystem _movement;
-        private readonly PlayerMovementConfig _movementConfig;
+        private readonly Transform _playerTransform;
+        private readonly Transform _cameraRoot;
+        private readonly IInputReader _inputReader;
+        private readonly PlayerCameraConfig _config;
 
-        private float   _verticalAngle;
-        private float   _bobTimer;
-        private Vector3 _cameraLocalPos;
-        private Vector3 _bobOffset;
-        private float   _currentCrouchOffset;
-        private Vector3 _bobReturnVelocity;
+        private float _pitch;
 
         public PlayerCameraSystem(
-            Transform            cameraRoot,
-            Camera               camera,
-            IInputReader         input,
-            PlayerCameraConfig   config,
-            PlayerMovementSystem movement,
-            PlayerMovementConfig movementConfig)
+            Transform playerTransform,
+            Transform cameraRoot,
+            IInputReader inputReader,
+            PlayerCameraConfig config)
         {
+            _playerTransform = playerTransform;
             _cameraRoot = cameraRoot;
-            _camera     = camera;
-            _input      = input;
-            _config     = config;
-            _movement   = movement;
-            _movementConfig = movementConfig;
-
-            _cameraLocalPos = camera.transform.localPosition;
+            _inputReader = inputReader;
+            _config = config;
         }
 
-        public void Tick(float dt)
+        public void Tick()
         {
-            HandleLook();
-            if (_config.enableHeadBob)
-                HandleHeadBob(dt);
-            HandleCrouchCameraOffset(dt);
-            ApplyCameraPosition();
-        }
+            Vector2 look = _inputReader.LookInput;
+            float yawDelta = look.x * _config.mouseSensitivity;
+            float pitchDelta = look.y * _config.mouseSensitivity;
 
-        private void HandleLook()
-        {
-            Vector2 look = _input.LookInput;
-            if (look.sqrMagnitude < 0.001f) return;
+            _playerTransform.Rotate(0f, yawDelta, 0f, Space.Self);
 
-            float yaw = look.x * _config.mouseSensitivity;
-            _cameraRoot.parent.Rotate(Vector3.up, yaw, Space.World);
-
-            _verticalAngle -= look.y * _config.mouseSensitivity;
-            _verticalAngle = Mathf.Clamp(_verticalAngle,
-                                         -_config.verticalClampDown,
-                                          _config.verticalClampUp);
-
-            _cameraRoot.localRotation = Quaternion.Euler(_verticalAngle, 0f, 0f);
-        }
-
-        private void HandleHeadBob(float dt)
-        {
-            if (_movement.IsMoving && _movement.IsGrounded)
-            {
-                float maxSpeed = _movement.IsCrouching ? _movementConfig.crouchSpeed : _movementConfig.walkSpeed;
-                float speedRatio = _movement.CurrentSpeed / maxSpeed;
-                _bobTimer += dt * _config.bobFrequency * speedRatio;
-
-                float bobY = (Mathf.PerlinNoise(_bobTimer, 0f) - 0.5f) * 2f * _config.bobAmplitudeY;
-                float bobX = (Mathf.PerlinNoise(0f, _bobTimer) - 0.5f) * 2f * _config.bobAmplitudeX;
-
-                _bobOffset = new Vector3(bobX, bobY, 0f);
-            }
-            else
-            {
-                _bobOffset = Vector3.SmoothDamp(
-                    _bobOffset,
-                    Vector3.zero,
-                    ref _bobReturnVelocity,
-                    1f / _config.bobSmoothReturn
-                );
-
-                if (_bobOffset.sqrMagnitude < 0.0001f)
-                    _bobTimer = 0f;
-            }
-        }
-
-        private void HandleCrouchCameraOffset(float dt)
-        {
-            float targetOffset = _movement.IsCrouching ? _config.crouchCameraOffset : 0f;
-            _currentCrouchOffset = Mathf.Lerp(_currentCrouchOffset, targetOffset,
-                                              _config.crouchCameraLerpSpeed * dt);
-        }
-
-        private void ApplyCameraPosition()
-        {
-            Vector3 targetPos = _cameraLocalPos;
-            targetPos.y      += _currentCrouchOffset;
-            targetPos        += _bobOffset;
-
-            _camera.transform.localPosition = targetPos;
+            _pitch -= pitchDelta;
+            _pitch = Mathf.Clamp(_pitch, -_config.verticalClampDown, _config.verticalClampUp);
+            _cameraRoot.localRotation = Quaternion.Euler(_pitch, 0f, 0f);
         }
     }
 }
