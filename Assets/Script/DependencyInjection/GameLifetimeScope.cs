@@ -1,7 +1,7 @@
+using Game.Player;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using Game.Player;
 
 namespace Game.DependencyInjection
 {
@@ -14,21 +14,19 @@ namespace Game.DependencyInjection
 
         protected override void Configure(IContainerBuilder builder)
         {
+            builder.RegisterComponent(_playerController);
+
             builder.RegisterInstance<IInputReader>(_inputReader);
             builder.RegisterInstance(_movementConfig);
             builder.RegisterInstance(_cameraConfig);
 
             builder.Register<PlayerMovementSystem>(Lifetime.Singleton)
-                .WithParameter(typeof(CharacterController), _playerController.CharacterController)
-                .WithParameter(typeof(Transform), _playerController.transform)
-                .AsSelf();
+                .WithParameter(_playerController.CharacterController)
+                .WithParameter(_playerController.transform);
 
             builder.Register<PlayerCameraSystem>(Lifetime.Singleton)
-                .WithParameter(typeof(Transform), _playerController.CameraRoot)
-                .WithParameter(typeof(Camera), _playerController.PlayerCamera)
-                .AsSelf();
-
-            builder.RegisterComponent(_playerController);
+                .WithParameter(_playerController.transform)
+                .WithParameter(_playerController.CameraRoot);
         }
     }
 }
