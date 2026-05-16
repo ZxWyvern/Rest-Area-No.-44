@@ -2,10 +2,11 @@ namespace Game.Interaction
 {
     public interface IHoldInteractable : IInteractable
     {
-        void OnInteractStarted();
-        void OnInteractHold(float progress);
-        void OnInteractCompleted();
-        void OnInteractCanceled();
-        float HoldDuration { get; }
+        bool SupportsHoldInteraction { get; }
+        float HoldDurationSeconds { get; }
+        void BeginHoldInteraction();
+        void UpdateHoldInteraction(float normalizedProgress);
+        void CompleteHoldInteraction();
+        void CancelHoldInteraction();
     }
 }

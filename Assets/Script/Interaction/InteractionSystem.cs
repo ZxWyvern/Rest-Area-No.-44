@@ -1,115 +1,205 @@
+using Game.Player;
 using UnityEngine;
+using VContainer;
 
 namespace Game.Interaction
 {
-    /// <summary>
-    /// Raycast dari camera ke depan untuk detect IInteractable.
-    /// Trigger highlight on hover dan OnInteract saat tombol ditekan.
-    /// </summary>
+    [DisallowMultipleComponent]
     public sealed class InteractionSystem : MonoBehaviour
     {
-        // ── Inspector ─────────────────────────────────────────────────────────────
-        [Header("Ray Settings")]
+        [Header("Raycast")]
+        [SerializeField, Min(0.1f)] private float _range = 2.5f;
+        [SerializeField] private LayerMask _interactableMask = ~0;
+        [SerializeField] private QueryTriggerInteraction _queryTriggerInteraction = QueryTriggerInteraction.Ignore;
+
+        [Header("References")]
         [SerializeField] private Camera _playerCamera;
-        [SerializeField] private float _interactRange = 2.5f;
-        [SerializeField] private LayerMask _interactMask = ~0; 
+        [SerializeField] private PlayerInputReader _inputReader;
+        [SerializeField] private InteractionPromptPresenter _promptPresenter;
 
-        [Header("Input")]
-        [SerializeField] private Game.Player.PlayerInputReader _inputReader;
+        private readonly RaycastHit[] _hits = new RaycastHit[1];
+        private IInteractable _currentInteractable;
+        private IHoldInteractable _currentHoldInteractable;
+        private float _holdElapsed;
+        private bool _holdActive;
 
-        // ── State ─────────────────────────────────────────────────────────────────
-        private IInteractable _currentTarget;
-        private InteractableHighlight _currentHighlight;
+        [Inject]
+        public void Construct(PlayerController playerController)
+        {
+            if (_playerCamera == null)
+            {
+                _playerCamera = playerController.PlayerCamera;
+            }
+        }
 
-        // ── Lifecycle ─────────────────────────────────────────────────────────────
         private void OnEnable()
         {
-            if (_inputReader != null)
-                _inputReader.InteractPerformed += OnInteractInput;
+            if (_inputReader == null)
+            {
+                Debug.LogError("[InteractionSystem] InputReader reference is missing.", this);
+                enabled = false;
+                return;
+            }
+
+            _inputReader.InteractPerformed += OnInteractPerformed;
         }
 
         private void OnDisable()
         {
             if (_inputReader != null)
-                _inputReader.InteractPerformed -= OnInteractInput;
+            {
+                _inputReader.InteractPerformed -= OnInteractPerformed;
+            }
 
-            ClearTarget();
+            CancelHoldInteraction();
+            SetCurrentTarget(null);
         }
 
         private void Update()
         {
-            DetectInteractable();
+            UpdateTarget();
+            UpdateHold(Time.deltaTime);
         }
 
-        // ── Detection ─────────────────────────────────────────────────────────────
-        private void DetectInteractable()
+        private void UpdateTarget()
         {
-            Ray ray = new Ray(_playerCamera.transform.position, _playerCamera.transform.forward);
-            Debug.DrawRay(ray.origin, ray.direction * _interactRange, Color.red);
-
-            if (Physics.Raycast(ray, out RaycastHit hit, _interactRange, _interactMask, QueryTriggerInteraction.Ignore))
+            if (_playerCamera == null)
             {
-                IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
+                return;
+            }
 
-                if (interactable != null && interactable.CanInteract)
+            Transform cameraTransform = _playerCamera.transform;
+            Ray ray = new Ray(cameraTransform.position, cameraTransform.forward);
+            int hitCount = Physics.RaycastNonAlloc(ray, _hits, _range, _interactableMask, _queryTriggerInteraction);
+
+            IInteractable next = null;
+            if (hitCount > 0)
+            {
+                Collider hitCollider = _hits[0].collider;
+                if (hitCollider != null)
                 {
-                    // KUNCI COCOK: Jika masih memandang objek interaktif yang sama, langsung batalkan eksekusi lanjutan.
-                    // Layer objek tidak diganggu, Raycast tidak akan mengalami disorientasi fisis.
-                    if (interactable == _currentTarget)
+                    next = hitCollider.GetComponentInParent<IInteractable>();
+                    if (next != null && !next.CanInteract())
                     {
-                        return;
+                        next = null;
                     }
-
-                    ClearTarget();
-                    SetTarget(interactable, hit.collider);
-                    return;
                 }
             }
 
-            // Lepas kunci target jika pandangan mata keluar dari seluruh collider objek
-            if (_currentTarget != null)
+            if (!ReferenceEquals(next, _currentInteractable))
             {
-                ClearTarget();
+                SetCurrentTarget(next);
             }
         }
 
-        // ── Target Management ─────────────────────────────────────────────────────
-        private void SetTarget(IInteractable interactable, Collider col)
+        private void SetCurrentTarget(IInteractable target)
         {
-            _currentTarget = interactable;
-            _currentTarget.OnHoverEnter();
+            if (ReferenceEquals(_currentInteractable, target))
+            {
+                return;
+            }
 
-            _currentHighlight = col.GetComponentInParent<InteractableHighlight>();
-            _currentHighlight?.SetHighlight(true);
+            CancelHoldInteraction();
+            _currentInteractable = target;
+            _currentHoldInteractable = target as IHoldInteractable;
+
+            if (_promptPresenter == null)
+            {
+                return;
+            }
+
+            if (_currentInteractable == null)
+            {
+                _promptPresenter.Hide();
+                return;
+            }
+
+            _promptPresenter.Show(_currentInteractable.GetInteractionPrompt());
         }
 
-        private void ClearTarget()
+        private void OnInteractPerformed()
         {
-            if (_currentTarget == null) return;
+            if (_currentInteractable == null || !_currentInteractable.CanInteract())
+            {
+                return;
+            }
 
-            _currentTarget.OnHoverExit();
-            _currentHighlight?.SetHighlight(false);
+            if (_currentHoldInteractable != null && _currentHoldInteractable.SupportsHoldInteraction)
+            {
+                StartHoldInteraction();
+                return;
+            }
 
-            _currentTarget = null;
-            _currentHighlight = null;
+            _currentInteractable.Interact();
         }
 
-        // ── Interact Input ────────────────────────────────────────────────────────
-        private void OnInteractInput()
+        private void StartHoldInteraction()
         {
-            if (_currentTarget == null || !_currentTarget.CanInteract) return;
-            _currentTarget.OnInteract();
+            if (_currentHoldInteractable == null)
+            {
+                return;
+            }
+
+            _holdElapsed = 0f;
+            _holdActive = true;
+            _currentHoldInteractable.BeginHoldInteraction();
+            _currentHoldInteractable.UpdateHoldInteraction(0f);
         }
 
-        // ── Gizmo ─────────────────────────────────────────────────────────────────
-#if UNITY_EDITOR
-        private void OnDrawGizmosSelected()
+        private void UpdateHold(float deltaTime)
         {
-            if (_playerCamera == null) return;
+            if (!_holdActive || _currentHoldInteractable == null)
+            {
+                return;
+            }
 
-            Gizmos.color = _currentTarget != null ? Color.green : Color.yellow;
-            Gizmos.DrawRay(_playerCamera.transform.position, _playerCamera.transform.forward * _interactRange);
+            if (!_currentHoldInteractable.CanInteract())
+            {
+                CancelHoldInteraction();
+                return;
+            }
+
+            float holdDuration = _currentHoldInteractable.HoldDurationSeconds;
+            if (holdDuration <= 0f)
+            {
+                CompleteHoldInteraction();
+                return;
+            }
+
+            _holdElapsed += deltaTime;
+            float normalized = Mathf.Clamp01(_holdElapsed / holdDuration);
+            _currentHoldInteractable.UpdateHoldInteraction(normalized);
+
+            if (normalized >= 1f)
+            {
+                CompleteHoldInteraction();
+            }
         }
-#endif
+
+        private void CompleteHoldInteraction()
+        {
+            if (_currentHoldInteractable == null)
+            {
+                return;
+            }
+
+            _holdActive = false;
+            _currentHoldInteractable.CompleteHoldInteraction();
+            _currentHoldInteractable.Interact();
+        }
+
+        private void CancelHoldInteraction()
+        {
+            if (!_holdActive || _currentHoldInteractable == null)
+            {
+                _holdActive = false;
+                _holdElapsed = 0f;
+                return;
+            }
+
+            _holdActive = false;
+            _holdElapsed = 0f;
+            _currentHoldInteractable.CancelHoldInteraction();
+        }
     }
 }
