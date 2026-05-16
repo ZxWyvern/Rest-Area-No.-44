@@ -14,6 +14,24 @@ namespace Game.DependencyInjection
 
         protected override void Configure(IContainerBuilder builder)
         {
+            if (_playerController == null)
+            {
+                Debug.LogError("[GameLifetimeScope] PlayerController reference is missing.", this);
+                return;
+            }
+
+            if (_inputReader == null || _movementConfig == null || _cameraConfig == null)
+            {
+                Debug.LogError("[GameLifetimeScope] Input/config references are missing.", this);
+                return;
+            }
+
+            if (_playerController.CharacterController == null || _playerController.CameraRoot == null)
+            {
+                Debug.LogError("[GameLifetimeScope] PlayerController dependencies are not assigned correctly.", _playerController);
+                return;
+            }
+
             builder.RegisterComponent(_playerController);
 
             builder.RegisterInstance<IInputReader>(_inputReader);

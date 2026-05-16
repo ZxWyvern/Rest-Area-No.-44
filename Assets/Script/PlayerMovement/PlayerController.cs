@@ -15,7 +15,18 @@ namespace Game.Player
         private PlayerMovementSystem _movementSystem;
         private PlayerCameraSystem _cameraSystem;
 
-        public CharacterController CharacterController => _characterController;
+        public CharacterController CharacterController
+        {
+            get
+            {
+                if (_characterController == null)
+                {
+                    _characterController = GetComponent<CharacterController>();
+                }
+
+                return _characterController;
+            }
+        }
         public Transform CameraRoot => _cameraRoot;
         public Camera PlayerCamera => _playerCamera;
 
@@ -28,7 +39,7 @@ namespace Game.Player
 
         private void Awake()
         {
-            _characterController = GetComponent<CharacterController>();
+            _characterController = CharacterController;
 
             if (_inputReader == null || _cameraRoot == null || _playerCamera == null)
             {
