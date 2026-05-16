@@ -1,9 +1,9 @@
-using UnityEngine;
 using Game.Interaction;
+using UnityEngine;
 
 public sealed class TestInteractable : InteractableBase
 {
-    public override void OnInteract()
+    public override void Interact()
     {
         Debug.Log($"[Interact] {gameObject.name}");
     }

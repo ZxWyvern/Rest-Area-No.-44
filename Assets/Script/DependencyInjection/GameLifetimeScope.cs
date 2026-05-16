@@ -1,7 +1,7 @@
+using Game.Player;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using Game.Player;
 
 namespace Game.DependencyInjection
 {
@@ -14,21 +14,37 @@ namespace Game.DependencyInjection
 
         protected override void Configure(IContainerBuilder builder)
         {
+            if (_playerController == null)
+            {
+                Debug.LogError("[GameLifetimeScope] PlayerController reference is missing.", this);
+                return;
+            }
+
+            if (_inputReader == null || _movementConfig == null || _cameraConfig == null)
+            {
+                Debug.LogError("[GameLifetimeScope] Input/config references are missing.", this);
+                return;
+            }
+
+            if (_playerController.CharacterController == null || _playerController.CameraRoot == null)
+            {
+                Debug.LogError("[GameLifetimeScope] PlayerController dependencies are not assigned correctly.", _playerController);
+                return;
+            }
+
+            builder.RegisterComponent(_playerController);
+
             builder.RegisterInstance<IInputReader>(_inputReader);
             builder.RegisterInstance(_movementConfig);
             builder.RegisterInstance(_cameraConfig);
 
             builder.Register<PlayerMovementSystem>(Lifetime.Singleton)
-                .WithParameter(typeof(CharacterController), _playerController.CharacterController)
-                .WithParameter(typeof(Transform), _playerController.transform)
-                .AsSelf();
+                .WithParameter(_playerController.CharacterController)
+                .WithParameter(_playerController.transform);
 
             builder.Register<PlayerCameraSystem>(Lifetime.Singleton)
-                .WithParameter(typeof(Transform), _playerController.CameraRoot)
-                .WithParameter(typeof(Camera), _playerController.PlayerCamera)
-                .AsSelf();
-
-            builder.RegisterComponent(_playerController);
+                .WithParameter(_playerController.transform)
+                .WithParameter(_playerController.CameraRoot);
         }
     }
 }
