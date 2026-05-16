@@ -1,0 +1,20 @@
+{
+    "name": "Game.Interaction",
+    "rootNamespace": "Game.Interaction",
+    "references": [
+        "Unity.InputSystem",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.HighDefinition.Runtime",
+        "Core",
+        "Game.Player"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

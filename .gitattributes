@@ -1,0 +1,222 @@
+# ======================================================================
+# UNITY PROJECT - PRODUCTION READY .gitattributes
+# Tujuan:
+# - Konsistensi line endings antar OS
+# - Git LFS untuk file besar
+# - Merge strategy aman untuk Unity YAML
+# - Menghindari corruption pada binary assets
+# ======================================================================
+
+
+# ======================================================================
+# TEXT FILES (WAJIB)
+# ======================================================================
+
+# Source Code
+*.cs                 text diff=csharp
+*.js                 text
+*.boo                text
+*.shader             text
+*.compute            text
+*.cginc              text
+*.hlsl               text
+*.glslinc            text
+
+# Unity YAML Assets
+*.unity              text
+*.prefab             text
+*.asset              text
+*.meta               text
+*.mat                text
+*.anim               text
+*.mask               text
+*.controller         text
+*.overrideController text
+*.playable           text
+*.spriteatlas        text
+*.terrainlayer       text
+*.inputactions       text
+*.lighting           text
+*.flare              text
+*.fontsettings       text
+*.guiskin            text
+*.mixer              text
+*.physicMaterial     text
+*.physicsMaterial2D  text
+*.preset             text
+*.renderTexture      text
+*.shadervariants     text
+*.signal             text
+*.state              text
+*.stateMachine       text
+*.timeline           text
+*.vfx                text
+*.asmdef             text
+*.asmref             text
+
+# Config / Data
+*.json               text
+*.xml                text
+*.yaml               text
+*.yml                text
+*.txt                text
+*.md                 text
+*.csv                text
+*.tsv                text
+*.log                text
+
+# Package Manager
+Packages/*.json      text
+ProjectSettings/*.asset text
+
+# Build / CI
+*.gradle             text
+*.properties         text
+*.bat                text eol=crlf
+*.cmd                text eol=crlf
+*.sh                 text eol=lf
+*.ps1                text eol=crlf
+
+
+# ======================================================================
+# UNITY SMART MERGE (YAML MERGE SUPPORT)
+# ======================================================================
+
+*.unity              merge=unityyamlmerge eol=lf
+*.prefab             merge=unityyamlmerge eol=lf
+*.asset              merge=unityyamlmerge eol=lf
+*.meta               merge=unityyamlmerge eol=lf
+*.mat                merge=unityyamlmerge eol=lf
+*.anim               merge=unityyamlmerge eol=lf
+*.controller         merge=unityyamlmerge eol=lf
+
+
+# ======================================================================
+# GIT LFS — 3D ASSETS
+# ======================================================================
+
+*.fbx                filter=lfs diff=lfs merge=lfs -text
+*.obj                filter=lfs diff=lfs merge=lfs -text
+*.blend              filter=lfs diff=lfs merge=lfs -text
+*.max                filter=lfs diff=lfs merge=lfs -text
+*.dae                filter=lfs diff=lfs merge=lfs -text
+*.3ds                filter=lfs diff=lfs merge=lfs -text
+*.c4d                filter=lfs diff=lfs merge=lfs -text
+*.mb                 filter=lfs diff=lfs merge=lfs -text
+*.ma                 filter=lfs diff=lfs merge=lfs -text
+*.skp                filter=lfs diff=lfs merge=lfs -text
+
+
+# ======================================================================
+# GIT LFS — TEXTURES / IMAGES
+# ======================================================================
+
+*.psd                filter=lfs diff=lfs merge=lfs -text
+*.psb                filter=lfs diff=lfs merge=lfs -text
+*.tga                filter=lfs diff=lfs merge=lfs -text
+*.png                filter=lfs diff=lfs merge=lfs -text
+*.jpg                filter=lfs diff=lfs merge=lfs -text
+*.jpeg               filter=lfs diff=lfs merge=lfs -text
+*.bmp                filter=lfs diff=lfs merge=lfs -text
+*.gif                filter=lfs diff=lfs merge=lfs -text
+*.exr                filter=lfs diff=lfs merge=lfs -text
+*.hdr                filter=lfs diff=lfs merge=lfs -text
+*.tif                filter=lfs diff=lfs merge=lfs -text
+*.tiff               filter=lfs diff=lfs merge=lfs -text
+*.dds                filter=lfs diff=lfs merge=lfs -text
+*.ktx                filter=lfs diff=lfs merge=lfs -text
+
+
+# ======================================================================
+# GIT LFS — AUDIO
+# ======================================================================
+
+*.wav                filter=lfs diff=lfs merge=lfs -text
+*.mp3                filter=lfs diff=lfs merge=lfs -text
+*.ogg                filter=lfs diff=lfs merge=lfs -text
+*.flac               filter=lfs diff=lfs merge=lfs -text
+*.aiff               filter=lfs diff=lfs merge=lfs -text
+*.xm                 filter=lfs diff=lfs merge=lfs -text
+*.mod                filter=lfs diff=lfs merge=lfs -text
+
+
+# ======================================================================
+# GIT LFS — VIDEO
+# ======================================================================
+
+*.mp4                filter=lfs diff=lfs merge=lfs -text
+*.mov                filter=lfs diff=lfs merge=lfs -text
+*.avi                filter=lfs diff=lfs merge=lfs -text
+*.mkv                filter=lfs diff=lfs merge=lfs -text
+*.webm               filter=lfs diff=lfs merge=lfs -text
+
+
+# ======================================================================
+# GIT LFS — FONTS
+# ======================================================================
+
+*.ttf                filter=lfs diff=lfs merge=lfs -text
+*.otf                filter=lfs diff=lfs merge=lfs -text
+*.woff               filter=lfs diff=lfs merge=lfs -text
+*.woff2              filter=lfs diff=lfs merge=lfs -text
+
+
+# ======================================================================
+# GIT LFS — PLUGINS / BINARIES
+# ======================================================================
+
+*.dll                filter=lfs diff=lfs merge=lfs -text
+*.so                 filter=lfs diff=lfs merge=lfs -text
+*.a                  filter=lfs diff=lfs merge=lfs -text
+*.lib                filter=lfs diff=lfs merge=lfs -text
+*.dylib              filter=lfs diff=lfs merge=lfs -text
+*.bundle             filter=lfs diff=lfs merge=lfs -text
+*.exe                filter=lfs diff=lfs merge=lfs -text
+*.apk                filter=lfs diff=lfs merge=lfs -text
+*.aab                filter=lfs diff=lfs merge=lfs -text
+*.ipa                filter=lfs diff=lfs merge=lfs -text
+
+
+# ======================================================================
+# GIT LFS — ARCHIVES / BACKUPS
+# ======================================================================
+
+*.zip                filter=lfs diff=lfs merge=lfs -text
+*.7z                 filter=lfs diff=lfs merge=lfs -text
+*.rar                filter=lfs diff=lfs merge=lfs -text
+*.tar                filter=lfs diff=lfs merge=lfs -text
+*.gz                 filter=lfs diff=lfs merge=lfs -text
+*.bak                filter=lfs diff=lfs merge=lfs -text
+
+
+# ======================================================================
+# BINARY ONLY (NO DIFF)
+# ======================================================================
+
+*.pdf                -text
+*.doc                -text
+*.docx               -text
+*.xls                -text
+*.xlsx               -text
+*.ppt                -text
+*.pptx               -text
+
+
+# ======================================================================
+# CACHE / GENERATED (SAFETY)
+# meskipun idealnya masuk .gitignore, ini sebagai fallback
+# ======================================================================
+
+Library/**           -text
+Temp/**              -text
+Obj/**               -text
+Build/**             -text
+Builds/**            -text
+Logs/**              -text
+UserSettings/**      -text
+MemoryCaptures/**    -text
+
+
+# ======================================================================
+# END
+# ======================================================================
