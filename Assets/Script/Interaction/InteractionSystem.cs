@@ -100,8 +100,21 @@ namespace Game.Interaction
             }
 
             CancelHoldInteraction();
+
+            if (_currentInteractable != null && _currentInteractable is Component oldComp)
+            {
+                if (oldComp.TryGetComponent<InteractableHighlight>(out var oldHighlight))
+                    oldHighlight.SetHighlight(false);
+            }
+
             _currentInteractable = target;
             _currentHoldInteractable = target as IHoldInteractable;
+
+            if (_currentInteractable != null && _currentInteractable is Component newComp)
+            {
+                if (newComp.TryGetComponent<InteractableHighlight>(out var newHighlight))
+                    newHighlight.SetHighlight(true);
+            }
 
             if (_promptPresenter == null)
             {

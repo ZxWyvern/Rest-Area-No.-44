@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 135f8f8c85623a842aef2f51601c8d2d, type: 3}
   m_Name: CameraConfig
-  m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerCameraConfig
+  m_EditorClassIdentifier: Game.Player::Game.Player.PlayerCameraConfig
   mouseSensitivity: 0.15
   controllerSensitivity: 120
   verticalClampUp: 80

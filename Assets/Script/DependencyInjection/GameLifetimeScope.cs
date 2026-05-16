@@ -39,12 +39,12 @@ namespace Game.DependencyInjection
             builder.RegisterInstance(_cameraConfig);
 
             builder.Register<PlayerMovementSystem>(Lifetime.Singleton)
-                .WithParameter(_playerController.CharacterController)
-                .WithParameter(_playerController.transform);
+                .WithParameter("characterController", _playerController.CharacterController)
+                .WithParameter("playerTransform", _playerController.transform);
 
             builder.Register<PlayerCameraSystem>(Lifetime.Singleton)
-                .WithParameter(_playerController.transform)
-                .WithParameter(_playerController.CameraRoot);
+                .WithParameter("playerTransform", _playerController.transform)
+                .WithParameter("cameraRoot", _playerController.CameraRoot);
         }
     }
 }
