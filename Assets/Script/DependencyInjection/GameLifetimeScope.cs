@@ -1,3 +1,4 @@
+using System;
 using Game.Player;
 using Game.Vehicle;
 using UnityEngine;
@@ -43,7 +44,9 @@ namespace Game.DependencyInjection
 
             builder.Register<PlayerCameraSystem>(Lifetime.Singleton)
                 .WithParameter("playerTransform", _playerController.transform)
-                .WithParameter("cameraRoot", _playerController.CameraRoot);
+                .WithParameter("cameraRoot", _playerController.CameraRoot)
+                .WithParameter("isGrounded", (Func<bool>)(() => _playerController.CharacterController.isGrounded))
+                .WithParameter("isMoving", (Func<bool>)(() => _playerController.CharacterController.velocity.sqrMagnitude > 0.01f));
 
             if (_vehicleControllers != null)
             {

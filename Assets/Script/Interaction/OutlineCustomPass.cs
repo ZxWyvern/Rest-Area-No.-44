@@ -25,22 +25,34 @@ namespace Game.Interaction
         private static readonly int _OutlineThicknessID = Shader.PropertyToID("_OutlineThickness");
         private static readonly int _OutlineBufferID = Shader.PropertyToID("_OutlineBuffer");
 
-        // List global untuk menampung renderer objek yang sedang di-hover
-        private static readonly HashSet<Renderer> ActiveRenderers = new HashSet<Renderer>();
+        private static readonly HashSet<Renderer> s_activeSet = new();
+        private static readonly List<Renderer> s_activeList = new();
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ClearOnLoad()
+        {
+            s_activeSet.Clear();
+            s_activeList.Clear();
+        }
+
+        /// <summary>Registers renderers to receive outline rendering this frame.</summary>
         public static void RegisterRenderers(Renderer[] renderers)
         {
-            foreach (var r in renderers)
+            foreach (Renderer r in renderers)
             {
-                if (r != null) ActiveRenderers.Add(r);
+                if (r != null && s_activeSet.Add(r))
+                    s_activeList.Add(r);
             }
         }
 
+        /// <summary>Unregisters renderers from outline rendering.</summary>
         public static void UnregisterRenderers(Renderer[] renderers)
         {
-            foreach (var r in renderers)
+            foreach (Renderer r in renderers)
             {
-                if (r != null) ActiveRenderers.Remove(r);
+                if (r == null) continue;
+                if (s_activeSet.Remove(r))
+                    s_activeList.Remove(r);
             }
         }
 
@@ -64,7 +76,7 @@ namespace Game.Interaction
                 dimension: TextureDimension.Tex2DArray,
                 colorFormat: GraphicsFormat.R8_UNorm,
                 useDynamicScale: true,
-                filterMode: FilterMode.Bilinear, // Interprolasi linear murni untuk meredam jitter piksel
+                filterMode: FilterMode.Bilinear,
                 name: "OutlineMaskBuffer"
             );
         }
@@ -73,26 +85,22 @@ namespace Game.Interaction
         {
             if (_outlineMaterial == null || _maskBuffer == null) return;
 
-            // 1. Bersihkan Mask Buffer menjadi hitam sebelum digambar
             CoreUtils.SetRenderTarget(ctx.cmd, _maskBuffer, ClearFlag.Color, Color.black);
 
-            // 2. Gambar semua renderer yang terdaftar ke mask buffer secara manual
-            if (_maskMaterial != null && ActiveRenderers.Count > 0)
+            if (_maskMaterial != null && s_activeList.Count > 0)
             {
-                foreach (var renderer in ActiveRenderers)
+                foreach (Renderer renderer in s_activeList)
                 {
-                    if (renderer == null || !renderer.gameObject.activeInHierarchy || !renderer.enabled) 
+                    if (renderer == null || !renderer.gameObject.activeInHierarchy || !renderer.enabled)
                         continue;
 
                     for (int subMeshIdx = 0; subMeshIdx < renderer.sharedMaterials.Length; subMeshIdx++)
                     {
-                        // Menghapus nama argumen shaderPassId demi kecocokan overload API CommandBuffer
                         ctx.cmd.DrawRenderer(renderer, _maskMaterial, subMeshIdx, 0);
                     }
                 }
             }
 
-            // 3. Render full screen outline shader menggunakan Sobel 9-Tap terfilter
             _outlineMaterial.SetColor(_OutlineColorID, outlineColor);
             _outlineMaterial.SetFloat(_OutlineThicknessID, outlineThickness);
             _outlineMaterial.SetTexture(_OutlineBufferID, _maskBuffer);
@@ -107,7 +115,8 @@ namespace Game.Interaction
             CoreUtils.Destroy(_maskMaterial);
             _maskBuffer?.Release();
             _maskBuffer = null;
-            ActiveRenderers.Clear();
+            s_activeSet.Clear();
+            s_activeList.Clear();
         }
     }
 }

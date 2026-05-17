@@ -10,6 +10,8 @@ namespace Game.Player
         private readonly PlayerMovementConfig _config;
 
         private float _verticalVelocity;
+        private Vector3 _smoothedHorizontalVelocity;
+        private Vector3 _velocitySmoothRef;
 
         public PlayerMovementSystem(
             CharacterController characterController,
@@ -34,6 +36,7 @@ namespace Game.Player
 
             Vector2 moveInput = _inputReader.MoveInput;
             Vector3 wishDirection = (_playerTransform.right * moveInput.x) + (_playerTransform.forward * moveInput.y);
+            wishDirection.y = 0f;
 
             if (wishDirection.sqrMagnitude > 1f)
             {
@@ -41,7 +44,17 @@ namespace Game.Player
             }
 
             float targetSpeed = _config.walkSpeed;
-            Vector3 horizontalVelocity = wishDirection * targetSpeed;
+            Vector3 targetHorizontal = wishDirection * targetSpeed;
+            float smoothTime = wishDirection.sqrMagnitude > 0.001f
+                ? _config.accelerationTime
+                : _config.decelerationTime;
+            _smoothedHorizontalVelocity = Vector3.SmoothDamp(
+                _smoothedHorizontalVelocity,
+                targetHorizontal,
+                ref _velocitySmoothRef,
+                smoothTime,
+                float.MaxValue,
+                deltaTime);
 
             bool grounded = _characterController.isGrounded;
             if (grounded && _verticalVelocity < 0f)
@@ -57,8 +70,8 @@ namespace Game.Player
                 }
             }
 
-            horizontalVelocity.y = _verticalVelocity;
-            _characterController.Move(horizontalVelocity * deltaTime);
+            _smoothedHorizontalVelocity.y = _verticalVelocity;
+            _characterController.Move(_smoothedHorizontalVelocity * deltaTime);
         }
     }
 }

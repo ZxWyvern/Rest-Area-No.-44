@@ -29,7 +29,7 @@ namespace Game.Vehicle
         [Header("Exit Velocity Transfer")]
         [SerializeField] [Range(0f, 1f)] private float _exitVelocityRetention = 0.3f;
 
-        private static readonly Collider[] _exitOverlapBuffer = new Collider[16];
+        private readonly Collider[] _exitOverlapBuffer = new Collider[16];
         private IInputReader _input;
         private PlayerController _playerController;
         private Rigidbody _rigidbody;
