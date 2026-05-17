@@ -198,7 +198,6 @@ namespace Game.Interaction
 
             _holdActive = false;
             _currentHoldInteractable.CompleteHoldInteraction();
-            _currentHoldInteractable.Interact();
         }
 
         private void CancelHoldInteraction()

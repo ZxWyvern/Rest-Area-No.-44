@@ -8,6 +8,10 @@ namespace Game.Player
         [Header("Walk")]
         public float walkSpeed = 3.5f;
 
+        [Header("Acceleration")]
+        [Min(0.01f)] public float accelerationTime = 0.12f;
+        [Min(0.01f)] public float decelerationTime = 0.08f;
+
         [Header("Slope & Step")]
         public float slopeLimit = 45f;
         public float stepOffset = 0.3f;

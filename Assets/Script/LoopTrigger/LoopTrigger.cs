@@ -36,8 +36,7 @@ namespace Game.Player
             if (_isTeleporting) return;
             if (!other.CompareTag("Player")) return;
 
-            if (_playerCC == null)
-                _playerCC = other.GetComponent<CharacterController>();
+            _playerCC = other.GetComponent<CharacterController>();
 
             StartCoroutine(LoopRoutine(other.transform));
         }

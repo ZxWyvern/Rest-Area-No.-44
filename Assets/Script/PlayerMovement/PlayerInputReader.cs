@@ -35,6 +35,17 @@ namespace Game.Player
 
         private PlayerControls _controls;
 
+        private void OnEnable()
+        {
+            MoveInput = Vector2.zero;
+            LookInput = Vector2.zero;
+            IsJumping = false;
+            IsSprinting = false;
+            IsCrouching = false;
+            ThrottleInput = 0f;
+            SteerInput = 0f;
+        }
+
         public void Enable()
         {
             if (_controls == null)
