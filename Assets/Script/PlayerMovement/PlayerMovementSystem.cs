@@ -30,6 +30,8 @@ namespace Game.Player
 
         public void Tick(float deltaTime)
         {
+            if (!_characterController.enabled) return;
+
             Vector2 moveInput = _inputReader.MoveInput;
             Vector3 wishDirection = (_playerTransform.right * moveInput.x) + (_playerTransform.forward * moveInput.y);
 

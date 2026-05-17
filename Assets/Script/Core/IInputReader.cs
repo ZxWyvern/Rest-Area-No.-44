@@ -22,7 +22,14 @@ namespace Game
         bool    IsSprinting { get; }
         bool    IsCrouching { get; }
 
+        event Action ExitVehiclePerformed;
+
+        float ThrottleInput { get; }
+        float SteerInput    { get; }
+
         void Enable();
         void Disable();
+        void EnableVehicleMap();
+        void EnablePlayerMap();
     }
 }

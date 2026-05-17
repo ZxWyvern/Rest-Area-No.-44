@@ -13,20 +13,8 @@ MonoBehaviour:
   m_Name: MovementConfig
   m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerMovementConfig
   walkSpeed: 3.5
-  sprintSpeed: 6
-  crouchSpeed: 1.8
-  groundAcceleration: 12
-  groundDeceleration: 10
-  airAcceleration: 4
-  jumpHeight: 1.2
-  coyoteTime: 0.15
-  jumpBufferTime: 0.15
-  jumpCutGravityMultiplier: 2
-  fallGravityMultiplier: 2.5
-  maxFallSpeed: 20
-  crouchHeight: 1
-  standHeight: 1.8
-  crouchTransitionSpeed: 10
   slopeLimit: 45
   stepOffset: 0.3
+  standHeight: 4.9
   gravityMagnitude: 9.81
+  maxFallSpeed: 20

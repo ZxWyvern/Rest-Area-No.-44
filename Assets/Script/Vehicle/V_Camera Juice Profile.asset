@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d6b70c4ab763cc49a741d6ee907c6e6, type: 3}
+  m_Name: V_Camera Juice Profile
+  m_EditorClassIdentifier: Game.Vehicle::Game.Vehicle.VehicleCameraJuiceProfile
+  accelPositionIntensity: 0.12
+  accelRotationIntensity: 2
+  accelMaxOffset: 0.3
+  accelMaxAngle: 5
+  steerRollIntensity: 0.95
+  steerYawIntensity: 1.06
+  steerPositionIntensity: 0.08
+  steerMaxAngle: 4.78
+  steerMaxOffset: 0.2
+  vibrationSpeedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.2
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 31.25
+      value: 0.48190308
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  vibPositionAmplitude: 0.003
+  vibRotationAmplitude: 0.26
+  vibFrequencyScale: 0.76
+  positionSmoothTime: 0.12
+  rotationSmoothTime: 0.1

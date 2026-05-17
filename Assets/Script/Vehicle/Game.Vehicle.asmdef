@@ -1,11 +1,12 @@
 {
-    "name": "Game.DependencyInjection",
-    "rootNamespace": "Game.DependencyInjection",
+    "name": "Game.Vehicle",
+    "rootNamespace": "Game.Vehicle",
     "references": [
-        "VContainer",
+        "Unity.InputSystem",
         "Core",
         "Game.Player",
-        "Game.Vehicle"
+        "Game.Interaction",
+        "VContainer"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
