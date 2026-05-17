@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d6b70c4ab763cc49a741d6ee907c6e6, type: 3}
   m_Name: V_Camera Juice Profile
   m_EditorClassIdentifier: Game.Vehicle::Game.Vehicle.VehicleCameraJuiceProfile
-  accelPositionIntensity: 0.12
-  accelRotationIntensity: 2
+  accelPositionIntensity: 0
+  accelRotationIntensity: 1
   accelMaxOffset: 0.3
-  accelMaxAngle: 5
-  steerRollIntensity: 0.95
-  steerYawIntensity: 1.06
+  accelMaxAngle: 2
+  steerRollIntensity: 0.5
+  steerYawIntensity: 0.9
   steerPositionIntensity: 0.08
-  steerMaxAngle: 4.78
+  steerMaxAngle: 1
   steerMaxOffset: 0.2
   vibrationSpeedCurve:
     serializedVersion: 2
